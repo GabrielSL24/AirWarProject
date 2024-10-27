@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using GraphLibrary;
 
 namespace GameAirWar
 {
@@ -14,10 +12,14 @@ namespace GameAirWar
     {
         private Bitmap bitmap;
         private VerifyLocation Location;
-        internal List<Point> PointsInLand = new List<Point>();      //Lista para las coordenadas en Tierra
-        internal List<Point> PointsInOcean = new List<Point>();     //Lista para las coordenadas en Océano
-        private List<List<Point>> PointsWorld = new List<List<Point>>();
-
+        internal List<Point> PointsInLand = new List<Point>();              //Lista para las coordenadas en Tierra
+        internal List<Point> PointsInOcean = new List<Point>();             //Lista para las coordenadas en Océano
+        private List<List<Point>> PointsWorld = new List<List<Point>>();    //Lista para las coordenadas de Tierra y Océano (Aún no están haciendo nada pero sirva para un futuro o sino se elimina)
+        internal HashSet<string> nodesInOcean = new HashSet<string>();      //HashSet para Portaaviones
+        internal HashSet<string> nodesInLand = new HashSet<string>();       //HashSet para Aeropuertos
+        internal HashSet<string> nodesInWorld = new HashSet<string>();      //HashSet para nodos de Aeropuertos y Portaaviones
+        
+        
         //Constructor de la clase
         internal Map()
         {
@@ -59,7 +61,9 @@ namespace GameAirWar
                     y = rand.Next(bitmap.Height);
                 }
                 while (!Location.InOcean(x, y));
-                PointsInOcean.Add(new Point(x, y));
+                PointsInOcean.Add(new Point(x, y));         //Coordenadas para mostrar en el mapa los Portaaviones
+                nodesInOcean.Add((x, y).ToString());
+                nodesInWorld.Add((x, y).ToString());        //Agrega las coordenadas (x, y) en el HashSet de los nodos de Portaaviones
             }
 
             //For para crear en Tierra
@@ -71,10 +75,18 @@ namespace GameAirWar
                     y = rand.Next(bitmap.Height);
                 }
                 while (!Location.InLand(x, y));
-                PointsInLand.Add(new Point(x, y));
+                PointsInLand.Add(new Point(x, y));          //Coordenadas para mostrar en el mapa los Aeropuertos
+                nodesInLand.Add((x, y).ToString());
+                nodesInWorld.Add((x, y).ToString());        //Agrega las coordenadas (x, y) en el HashSet de los nodos de Aeropuertos
             }
+
+            //Crea de los HashSet los nodos de los grafos
+            Graph g = GraphFactory.CreateGraph(nodesInWorld);
+
+            //Esto aún no hace nada pero sirva para un futuro o sino se elimina
             PointsWorld.Add(PointsInOcean);
             PointsWorld.Add(PointsInLand);
+
             return PointsWorld;
         }
     }

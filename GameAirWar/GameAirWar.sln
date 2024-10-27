@@ -4,6 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameAirWar", "GameAirWar.csproj", "{9021235A-4FC5-4AAC-AC5C-179443FE2C97}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F8E69BAA-82E4-42A7-A1E2-6AAF34C43C84} = {F8E69BAA-82E4-42A7-A1E2-6AAF34C43C84}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphLibrary", "..\GraphLibrary2\GraphLibrary.csproj", "{F8E69BAA-82E4-42A7-A1E2-6AAF34C43C84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +20,10 @@ Global
 		{9021235A-4FC5-4AAC-AC5C-179443FE2C97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9021235A-4FC5-4AAC-AC5C-179443FE2C97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9021235A-4FC5-4AAC-AC5C-179443FE2C97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8E69BAA-82E4-42A7-A1E2-6AAF34C43C84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8E69BAA-82E4-42A7-A1E2-6AAF34C43C84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8E69BAA-82E4-42A7-A1E2-6AAF34C43C84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8E69BAA-82E4-42A7-A1E2-6AAF34C43C84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -32,7 +32,7 @@ namespace GameAirWar
             MapPictureBox.Invalidate();
         }
 
-        //Función para pintar las localizaciones
+        //Función para dibujar las localizaciones
         private void MapPictureBox_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;

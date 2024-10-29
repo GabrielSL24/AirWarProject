@@ -18,7 +18,7 @@ namespace GameAirWar.OperationsMap
             _bitmap = bit;
         }
 
-        //Función para verificar si se creo en el Océano
+        //Función para verificar si se creó en el Océano
         internal bool InOcean(int x, int y)
         {
             if (x < 0 || y < 0 || x >= _bitmap.Width || y >= _bitmap.Height)

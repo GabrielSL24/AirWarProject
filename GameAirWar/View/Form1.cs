@@ -19,13 +19,13 @@ namespace GameAirWar
         private CreateLocation location;
         public Form1()
         {
-            InitializeComponent();
-            map = new Map();
+            InitializeComponent(); //Se inicializa el componente gráfico
+            map = new Map(); //Se crea un objeto del tipo Map
             location = new CreateLocation(map);
             MapPictureBox.Image = map.GetMapBit();
 
-            oceanShip = new Bitmap("Images/Portaaviones.png");
-            landAiroport = new Bitmap("Images/Aeropuerto.png");
+            oceanShip = new Bitmap("View/Images/Portaaviones.png");
+            landAiroport = new Bitmap("View/Images/Aeropuerto.png");
 
             location.GenerarPosicion();
             MapPictureBox.Paint += MapPictureBox_Paint;  

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using GraphLibrary;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
+using GameAirWar.Controller;
 
 namespace GameAirWar
 {
@@ -11,6 +13,7 @@ namespace GameAirWar
     public class Map
     {
         private Bitmap bitmap;
+        private Random rand = new Random();
         private VerifyLocation Location; //Llama a la clase VerifyLocation creando una instancia.
         internal List<Point> PointsInLand = new List<Point>();            //Lista para las coordenadas en Tierra
         internal List<Point> PointsInOcean = new List<Point>();             //Lista para las coordenadas en Océano
@@ -18,8 +21,10 @@ namespace GameAirWar
         internal HashSet<string> nodesInOcean = new HashSet<string>();      //HashSet para Portaaviones
         internal HashSet<string> nodesInLand = new HashSet<string>();       //HashSet para Aeropuertos
         internal HashSet<string> nodesInWorld = new HashSet<string>();      //HashSet para nodos de Aeropuertos y Portaaviones
-        
-        
+        internal List<KeyValuePair<string, object>> ListRutas = new List<KeyValuePair<string, object>>();
+        internal CreateRutas rutas;
+
+
         //Constructor de la clase
         internal Map()
         {
@@ -49,7 +54,6 @@ namespace GameAirWar
         //Función para Generar las posiciones de aeropuertos y portaaviones
         public List<List<Point>> GenerarPosicionAleatoria()
         {
-            Random rand = new Random();
             int x, y;
 
             //For para crear en Océano
@@ -81,10 +85,14 @@ namespace GameAirWar
                     nodesInWorld.Add((x, y).ToString());        //Agrega las coordenadas (x, y) en el HashSet de los nodos de Aeropuertos
 
             }
-
             //Crea de los HashSet los nodos de los grafos
             Graph g = GraphFactory.CreateGraph(nodesInWorld);
 
+            rutas = new CreateRutas(nodesInOcean, nodesInLand);
+
+            //Crear las rutas aleatorias de los nodos
+            rutas.GetMapRutas(g, ListRutas);
+            
             //Esto aún no hace nada pero sirva para un futuro o sino se elimina
             //Cantidad y cuenta de los puntos totales
             PointsWorld.Add(PointsInOcean);

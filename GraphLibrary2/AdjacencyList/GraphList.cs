@@ -10,6 +10,7 @@ namespace GraphLibrary.AdjacencyList
     internal class GraphList : Graph
     {
         private Dictionary<string, GraphNode> nodes;
+        private Random rand = new Random();
 
         //Constructor que incializa el grafo con un conjunto de nodos 
         internal GraphList(HashSet<string> nodes)
@@ -37,5 +38,20 @@ namespace GraphLibrary.AdjacencyList
             }
             
         }
+
+        //Función para obtener un nodo aleatoriamente
+        public KeyValuePair<string, object>? GetRandomNode()
+        {
+            if (nodes.Count == 0)
+                return null;
+            
+            int randomindex = rand.Next(nodes.Count);
+            var randomNode = nodes.ElementAt(randomindex);
+            return new KeyValuePair<string, object>(randomNode.Key, (object)randomNode.Value);
+        }
+
+
+
+
     }
 }

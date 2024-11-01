@@ -44,12 +44,17 @@ namespace GameAirWar.Controller
                     string randomKey2 = randomNode2.Value.Key;
                     var randomValue = randomNode.Value.Value;
                     var randomValue2 = randomNode2.Value.Value;
+                    weight = 0;
+
 
                     //Verifica los tipos de ubicación de los nodos para calcular el peso adecuado
                     (LocationType, LocationType) location = Verify(Ocean, Land, randomKey, randomKey2);
 
+                    //Guarda el peso de la diferencia entre las distancias
+                    weight = ValuesXY(randomKey, randomKey2);
+
                     //Crea el peso basandose en donde se ubican los nodos
-                    createWeight = new CreateWeight(location);
+                    createWeight = new CreateWeight(location, weight);
 
                     //Agrega una rista al grafo entre los nodos con el peso calculado
                     graph.AddEdge(randomKey, randomKey2, createWeight.weight);
@@ -87,6 +92,32 @@ namespace GameAirWar.Controller
                 return (LocationType.Ocean, LocationType.Land);     //"One in Ocean, One in Land"
             }
             return (LocationType.Error, LocationType.Error);
+        }
+
+        //Función que retorna el valor de la distancia entre nodos
+        private int ValuesXY(string node1, string node2)
+        {
+            int tempWeight;
+            
+            //Coordenadas (x, y) de los nodos
+            var tuple1 = ParseId(node1);
+            var tuple2 = ParseId(node2);
+            
+            //Calcula la diferencia
+            int tempIntX = Math.Abs(tuple1.x - tuple2.x);
+            int tempIntY = Math.Abs(tuple1.y - tuple2.y);
+
+            tempWeight = tempIntX + tempIntY;
+
+            return tempWeight;
+        }
+
+        //Función que cambia de String a tupla(int, int)
+        private (int x, int y) ParseId(string id)
+        {
+            id = id.Trim('(', ')');
+            var parts = id.Split(',');
+            return (X: int.Parse(parts[0]), Y: int.Parse(parts[1]));
         }
     }
 }

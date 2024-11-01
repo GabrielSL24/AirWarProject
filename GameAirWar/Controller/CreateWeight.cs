@@ -12,6 +12,7 @@ namespace GameAirWar.Controller
     internal class CreateWeight
     {
         internal int weight;
+        private int tempWeight;
         //Convertir los tipos de precio de las opciones a enteros
         private int oceanPrice = (int)PriceWeight.Ocean;
         private int landPrice = (int)PriceWeight.Land;
@@ -21,15 +22,16 @@ namespace GameAirWar.Controller
         private LocationType TypeNode2;
 
         //Constructor de la clase
-        public CreateWeight((LocationType type1, LocationType type2) Types)
+        public CreateWeight((LocationType type1, LocationType type2) Types, int Weight)
         {
             TypeNode1 = Types.type1;
             TypeNode2 = Types.type2;
-            IdentifyWeight(TypeNode1, TypeNode2);
+            this.tempWeight = Weight;
+            IdentifyWeight(TypeNode1, TypeNode2, tempWeight);
         }
 
         //Función que identifica el peso basado en los tipos de ubicación de ambos nodos
-        private int IdentifyWeight(LocationType typeNode1, LocationType typeNode2)
+        private int IdentifyWeight(LocationType typeNode1, LocationType typeNode2, int weight2)
         {
             bool nodeInOcean = typeNode1.Equals(LocationType.Ocean);
             bool nodeInOcean2 = typeNode2.Equals(LocationType.Ocean);
@@ -39,26 +41,25 @@ namespace GameAirWar.Controller
 
             if (nodeInOcean && nodeInOcean2)
             {
-                weight = portaavionesPrice + oceanPrice;
+                weight = portaavionesPrice + oceanPrice + weight2;
                 return weight;
             }
             else if (nodeInLand && nodeInLand2)
             {
-                weight = airportPrice + landPrice;
+                weight = airportPrice + landPrice + weight2;
                 return weight;
             }
             else if (nodeInOcean && nodeInLand2)
             {
-                weight = oceanPrice + airportPrice;
+                weight = oceanPrice + airportPrice + weight2;
                 return weight;
             }
             else if (nodeInLand && nodeInOcean2)
             {
-                weight = oceanPrice + portaavionesPrice;
+                weight = oceanPrice + portaavionesPrice + weight2;
                 return weight;
             }
             return 0;
-
         }
     }
 }

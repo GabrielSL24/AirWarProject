@@ -83,7 +83,6 @@ namespace GameAirWar
                     PointsInLand.Add(new Point(x, y));          //Coordenadas para mostrar en el mapa los Aeropuertos
                     nodesInLand.Add((x, y).ToString());
                     nodesInWorld.Add((x, y).ToString());        //Agrega las coordenadas (x, y) en el HashSet de los nodos de Aeropuertos
-
             }
             //Crea de los HashSet los nodos de los grafos
             Graph g = GraphFactory.CreateGraph(nodesInWorld);

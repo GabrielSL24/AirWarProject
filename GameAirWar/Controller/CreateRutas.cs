@@ -14,6 +14,7 @@ namespace GameAirWar.Controller
         internal HashSet<string> Ocean;
         internal HashSet<string> Land;
         private CreateWeight createWeight;
+        private int weight;
 
         // Constructor de la clase
         internal CreateRutas(HashSet<string> ocean, HashSet<string> land)

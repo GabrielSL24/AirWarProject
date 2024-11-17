@@ -44,10 +44,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1145, 860);
+            this.ClientSize = new System.Drawing.Size(1145, 2260);
             this.Controls.Add(this.MapPictureBox);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "AirWar Game";
             ((System.ComponentModel.ISupportInitialize)(this.MapPictureBox)).EndInit();
             this.ResumeLayout(false);
 

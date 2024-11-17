@@ -98,7 +98,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
+	<ItemGroup>
+		<Compile Include="Model\Avion.cs" />
+	</ItemGroup>
+	<ItemGroup>
     <ProjectReference Include="..\GraphLibrary2\GraphLibrary.csproj">
       <Project>{f8e69baa-82e4-42a7-a1e2-6aaf34c43c84}</Project>
       <Name>GraphLibrary</Name>

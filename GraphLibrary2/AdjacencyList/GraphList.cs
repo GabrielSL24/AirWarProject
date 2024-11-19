@@ -12,19 +12,19 @@ namespace GraphLibrary.AdjacencyList
         private Dictionary<string, GraphNode> nodes;
         private Random rand = new Random();
 
-        //Constructor que incializa el grafo con un conjunto de nodos 
+        // Constructor que incializa el grafo con un conjunto de nodos 
         public GraphList(HashSet<string> nodes)
         {
-            //Inicializa el diccionario con la capacidad del número de nodos
+            // Inicializa el diccionario con la capacidad del número de nodos
             this.nodes = new Dictionary<string, GraphNode>(nodes.Count);
             foreach (string node in nodes)
             {
-                //Agrega un nuevo GraphNode al diccionario con su ID como clave
+                // Agrega un nuevo GraphNode al diccionario con su ID como clave
                 this.nodes.Add(node, new GraphNode(node));
             }
         }
 
-        //Método para agregar una arista entre dos nodos del grafo
+        // Método para agregar una arista entre dos nodos del grafo
         public void AddEdge(string sourceId, string targetId, int weight)
         {
             //Intenta obtener el nodo fuente (sorceNode) del diccionario usando su ID
@@ -38,7 +38,7 @@ namespace GraphLibrary.AdjacencyList
             }
         }
 
-        //Función para obtener un nodo aleatoriamente
+        // Función para obtener un nodo aleatoriamente
         public KeyValuePair<string, object>? GetRandomNode()
         {
             if (nodes.Count == 0)
@@ -104,6 +104,22 @@ namespace GraphLibrary.AdjacencyList
             }
 
             return (distances[targetId], path);
+        }
+
+        // Método para retornar un Nodo
+        public GraphNode GetNode(string key)
+        {
+            if (nodes.Count == 0)
+                return null;
+
+            foreach (var node in nodes)
+            {
+                if (node.Key == key)
+                {
+                    return node.Value;
+                }
+            }
+            return null;
         }
 
         /* ----------- verificcaciones adicionales para mejorar el cálculo de las rutas ---------------*/

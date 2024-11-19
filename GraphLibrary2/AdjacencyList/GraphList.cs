@@ -36,7 +36,6 @@ namespace GraphLibrary.AdjacencyList
             {
                 throw new KeyNotFoundException($"No se encontró el nodo con ID: {sourceId}");
             }
-            
         }
 
         //Función para obtener un nodo aleatoriamente

@@ -1,4 +1,5 @@
 ﻿using GraphLibrary;
+using GraphLibrary.AdjacencyList;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace GameAirWar.Controller
                 return;
             }
 
-            for (int i = 0; i < 25; i++)
+            for (int i = 0; i < 75; i++)
             {
                 //Obtiene dos nodos aleatorios del grafo
                 var randomNode = graphList.GetRandomNode();

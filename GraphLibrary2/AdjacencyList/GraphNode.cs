@@ -5,7 +5,7 @@ namespace GraphLibrary.AdjacencyList
     // Clase para la estructura de un nodo
     public class GraphNode
     {
-        internal string Id {  get; set; }
+        public string Id {  get; set; }
 
         internal List<Edge> edges { get; } = new List<Edge>();
         public List<IAvion> IdAviones { get; set; } = new List<IAvion>();

@@ -51,6 +51,9 @@
     <Compile Include="Controller\CreateLocation.cs" />
     <Compile Include="Controller\CreateRutas.cs" />
     <Compile Include="Controller\CreateWeight.cs" />
+    <Compile Include="Controller\GridsData.cs" />
+    <Compile Include="Model\Bullet.cs" />
+    <Compile Include="Model\Gun.cs" />
     <Compile Include="Model\Map.cs" />
     <Compile Include="Model\VerifyLocationInMap.cs" />
     <Compile Include="Program.cs" />
@@ -91,17 +94,26 @@
     <Content Include="View\Images\Aeropuerto.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="View\Images\Avion.jpeg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="View\Images\Avion2.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="View\Images\GameMap.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="View\Images\Portaaviones.png">
+    <Content Include="View\Images\Gun.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="View\Images\PortaAviones2.jpeg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-	<ItemGroup>
-		<Compile Include="Model\Avion.cs" />
-	</ItemGroup>
-	<ItemGroup>
+  <ItemGroup>
+    <Compile Include="Model\Avion.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\GraphLibrary2\GraphLibrary.csproj">
       <Project>{f8e69baa-82e4-42a7-a1e2-6aaf34c43c84}</Project>
       <Name>GraphLibrary</Name>

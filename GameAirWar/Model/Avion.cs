@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic; // Necesario para usar List<>
+using System.Drawing;
 using GraphLibrary.AdjacencyList;
 
 namespace GameAirWar
@@ -14,6 +15,9 @@ namespace GameAirWar
         public int Distancia { get; set; }
         public List<string> RutaRecorrida { get; set; }
         public int Gasolina { get; set; }
+        public PointF PosicionActual {  get; set; }
+        public float Progreso { get; set; } = 0.0f;
+        public Color RutaColor { get; set; }
 
         public Avion(string origen, string destino, List<string> ruta, int distancia)
         {

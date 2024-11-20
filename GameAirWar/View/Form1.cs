@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GraphLibrary.AdjacencyList;
 using System.Runtime.InteropServices;
+using GameAirWar.Model;
+using GameAirWar.Controller;
 
 
 
@@ -17,14 +19,23 @@ namespace GameAirWar
     {
         private Bitmap oceanShip;
         private Bitmap landAiroport;
+        private Bitmap bitmapAvion;
+        private Bitmap bitmapGun;
         private Random random = new Random(); // Generador de números aleatorios
         private Map map;
         private List<Avion> aviones = new List<Avion>(); //Lista de aviones que se pondrán a volar
+        private List<Gun> maps = new List<Gun>();
         private CreateLocation location;
         private Timer routeTimer; // Agregar un Timer para calcular rutas periódicamente
-        private Timer avionTimer; // Agregar un Timer para actualizar el movimiento de los aviones
+        private Timer avionTimer; // Agregar un Timer para actualizar el movimiento de rutas de los aviones
+        private Timer visualAvionTimer; // Agregar un Timer para actualizar el movimiento continuo de los aviones
+        private Timer gunTimer; // Agregar un Timer para el movimiento del cañon
+        private Timer shootTimer; // Agregar un Timer para el disparo continuo
+        private Gun gun = new Gun();
+        private GridsData data = new GridsData(); // Instancia para la clase de los Grids
         private int processedNodesCount = 0; // Conteo de nodos procesados
         private const int maxNodesPerBatch = 5; // Máximo de nodos a procesar por iteración
+        private bool isMouseDown = false;
 
         public Form1()
         {
@@ -35,8 +46,10 @@ namespace GameAirWar
             location = new CreateLocation(map);
             MapPictureBox.Image = map.GetMapBit();
 
-            oceanShip = new Bitmap("View/Images/Portaaviones.png");
+            oceanShip = new Bitmap("View/Images/PortaAviones2.jpeg");
             landAiroport = new Bitmap("View/Images/Aeropuerto.png");
+            bitmapAvion = new Bitmap("View/Images/Avion2.jpg");
+            bitmapGun = new Bitmap("View/Images/Gun.jpg");
 
             location.GenerarPosicion();
 
@@ -52,12 +65,39 @@ namespace GameAirWar
             avionTimer.Tick += AvionTimer_Tick;
             avionTimer.Start();
 
+            // Configuración del Timer para la visualización de los aviones
+            visualAvionTimer = new Timer();
+            visualAvionTimer.Interval = 50;
+            visualAvionTimer.Tick += VisualTimer_Tick;
+            visualAvionTimer.Start();
+
+            // Configuración del Timer para la bala
+            shootTimer = new Timer();
+            shootTimer.Interval = 300;
+            shootTimer.Tick += (s, e) =>
+            {
+                if (isMouseDown)
+                {
+                    gun.BulletSpeed += 1;
+                }
+            };
+            shootTimer.Start();
+
+            // Configuración del Timer para el movimiento de la pistola
+            gunTimer = new Timer();
+            gunTimer.Interval = 5;
+            gunTimer.Tick += GunTimer_Tick;
+            gunTimer.Start();
+
+            // Configuración de la pistola
+            gun.Y = MapPictureBox.Height - 25;
+
             // Calcular rutas automáticamente:
             CalculateAutomaticRoutes(); // Asegúrate de que esto se llame aquí
 
             MapPictureBox.Paint += MapPictureBox_Paint;  
             MapPictureBox.Invalidate();
-            this.ClientSize = new System.Drawing.Size(855, 732); // Tamaño deseado
+            this.ClientSize = new System.Drawing.Size(1348, 750); // Tamaño deseado
         }
         [DllImport("kernel32.dll")]
         private static extern bool AllocConsole();
@@ -72,18 +112,31 @@ namespace GameAirWar
             // Dibujar los nodos (aeropuertos y portaaviones)
             foreach (Point p in map.PointsInOcean)
             {
-                g.DrawImage(oceanShip, p.X - oceanShip.Width / 2, p.Y - oceanShip.Height / 2);
+                g.DrawImage(oceanShip, p.X - oceanShip.Width / 3, p.Y - oceanShip.Height / 3);
             }
 
             foreach (Point p in map.PointsInLand)
             {
-                g.DrawImage(landAiroport, p.X - landAiroport.Width / 2, p.Y - landAiroport.Height / 2);
+                g.DrawImage(landAiroport, p.X - landAiroport.Width / 3, p.Y - landAiroport.Height / 3);
             }
 
             foreach (var avion in aviones)
             {
+                if (avion.Ruta.Count > 1)
+                {
+                    var currentNode = ParsePoint(avion.Ruta[0]);
+                    var nextNode = ParsePoint(avion.Ruta[1]);
+
+                    // Calcular posición interpolada del avion
+                    float progress = avion.Progreso;
+                    int interpolatedX = (int)(currentNode.X + progress * (nextNode.X - currentNode.X));
+                    int interpolatedY = (int)(currentNode.Y + progress * (nextNode.Y - currentNode.Y));
+                    // Va dibujando el avión poco a poco
+                    g.DrawImage(bitmapAvion, interpolatedX - 5, interpolatedY - 5);
+                }
+
                 // Generar un color aleatorio para la ruta
-                Pen routePen = new Pen(Color.FromArgb(random.Next(256), random.Next(256), random.Next(256)), 2);
+                Pen routePen = new Pen(avion.RutaColor);
 
                 for (int i = 0; i < avion.Ruta.Count - 1; i++)
                 {
@@ -91,6 +144,14 @@ namespace GameAirWar
                     var end = ParsePoint(avion.Ruta[i + 1]);
                     g.DrawLine(routePen, start, end);
                 }
+            }
+
+            // Dibuja la linea para el cañon al igual que agrega la imagen y balas
+            g.DrawLine(Pens.Black, 0, MapPictureBox.Height - 25, MapPictureBox.Width, MapPictureBox.Height - 25);
+            g.DrawImage(bitmapGun, gun.X - 5, gun.Y - 5);
+            foreach (var bullet in gun.GetBullets())
+            {
+                g.FillEllipse(Brushes.Gold, bullet.X, bullet.Y, 10, 10);
             }
         }
 
@@ -108,6 +169,19 @@ namespace GameAirWar
             int currentCount = 0; // Contador de nodos procesados
 
             var graph = map.GetGraph() as GraphList;
+            
+            // Elimina del Grid los Hangares que hay para actualizarlos
+            foreach (string stringNode in map.nodesInOcean)
+            {
+                var node = graph.GetNode(stringNode);
+                data.RemoveHangarFromDataGrid(node, HangarData);
+            }
+            foreach (string stringNode in map.nodesInLand)
+            {
+                var node = graph.GetNode(stringNode);
+                data.RemoveHangarFromDataGrid(node, HangarData);
+            }
+            // Lógica principal que tiene el CalculateAutomaticRoutes
             if (graph == null)
             {
                 Console.WriteLine("El grafo no es del tipo esperado (GraphList).");
@@ -135,22 +209,27 @@ namespace GameAirWar
                         // Configuración de los aviones
                         var originNode = graph.GetNode(origen);
                         var destinyNode = graph.GetNode(destino);
-                        bool createAvion = random.Next(0, 2) == 0; // True or False
 
-                        if (originNode.IdAviones.Count != 0 && createAvion) // Verificar si el Hangar tiene ya un avión y otorgarle la ruta
+                        if (originNode.IdAviones.Count != 0) // Verificar si el Hangar tiene ya un avión y otorgarle la ruta
                         {
-                            Avion avion = (Avion)originNode.IdAviones[0];
+                            Avion randAvion = (Avion)originNode.IdAviones[random.Next(0, originNode.IdAviones.Count)];
+                            data.RemoveAvionFromDataGrid(randAvion, AvionesData); // Primeramente lo borra para actualizar el Grid
+                            Avion avion = randAvion;
                             avion.Origen = origen;
                             avion.Destino = destino;
                             avion.Ruta = result.path;
                             avion.Distancia = result.distance;
+                            avion.RutaColor = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256));
                             aviones.Add(avion);
+                            AvionesData.Rows.Add(avion.Id, avion.Origen, avion.Destino, avion.Gasolina); // Se agrega al Grid de los aviones en caos de que ya exista el avión
                         }
                         else if (originNode.cantAviones > originNode.IdAviones.Count) // Verificar si elHangar no está lleno para crear el avión con ruta
                         {
                             Avion avion = new Avion(origen, destino, result.path, result.distance);
+                            avion.RutaColor = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256));
                             aviones.Add(avion);
                             originNode.IdAviones.Add(avion);
+                            AvionesData.Rows.Add(avion.Id, avion.Origen, avion.Destino, avion.Gasolina); // Se agrega al Grid de los aviones
                         }
                         else { continue; }
                     }
@@ -191,52 +270,95 @@ namespace GameAirWar
         {
             avionTimer.Stop(); //Detiene el Timer mientra se procesa
 
-            Bitmap mapBitmap = (Bitmap)MapPictureBox.Image.Clone();
-            using (Graphics g = Graphics.FromImage(mapBitmap))
+            List<Avion> avionesParaEliminar = new List<Avion>();
+            var graph = map.GetGraph() as GraphList;
+            foreach (var avion in aviones)
             {
-                var graph = map.GetGraph() as GraphList;
-                foreach (var avion in aviones)
+                // Elimina del Grid los Hangares que hay para actualizarlos
+                foreach (string stringNode in map.nodesInOcean)
                 {
-                    if ( avion.Ruta.Count > 1 ) // Si el avión tiene más nodos en su ruta
+                    var node = graph.GetNode(stringNode);
+                    data.RemoveHangarFromDataGrid(node, HangarData);
+                }
+                foreach (string stringNode in map.nodesInLand)
+                {
+                    var node = graph.GetNode(stringNode);
+                    data.RemoveHangarFromDataGrid(node, HangarData);
+                }
+
+                // Eliminar los registros de los aviones en el Grid
+                data.RemoveAvionFromDataGrid(avion, AvionesData);
+                if ( avion.Ruta.Count > 1 && avion.Progreso >= 1.0f) // Si el avión tiene más nodos en su ruta
+                {
+                    avion.Progreso = 0.0f;
+
+                    // Actualiza las posiciones de los nodos
+                    string stringCurrentNode = avion.Ruta[0];
+                    string stringNextNode = avion.Ruta[1];
+                    var currentNode = graph.GetNode(stringCurrentNode);
+                    var nextNode = graph.GetNode(stringNextNode);
+    
+                    if (nextNode.cantAviones > nextNode.IdAviones.Count)
                     {
-                        avion.Gasolina -= 4; //Reduce la gasolina del avión
-                        // Actualiza las posiciones de los nodos
-                        string stringCurrentNode = avion.Ruta[0];
-                        string stringNextNode = avion.Ruta[1];
-                        var currentNode = graph.GetNode(stringCurrentNode);
-                        var nextNode = graph.GetNode(stringNextNode);
+                        //gun.RemoveAvionFromDataGrid(avion, AvionesData);
+                        avion.Gasolina -= 5; //Reduce la gasolina del avión
+                        nextNode.IdAviones.Add(avion);
+                        currentNode.IdAviones.Remove(avion);    
+                    } else { break; }
+                    
 
-                        if (nextNode.cantAviones > nextNode.IdAviones.Count)
-                        {
-                            nextNode.IdAviones.Add(avion);
-                            currentNode.IdAviones.Remove(avion);
-                        } else { break; }
+                    avion.RutaRecorrida.Add(stringCurrentNode); // Mueve el avión al siguiente nodo
+                    avion.Ruta.RemoveAt(0);
 
-                        avion.RutaRecorrida.Add(stringCurrentNode); // Mueve el avión al siguiente nodo
-                        avion.Ruta.RemoveAt(0);
-
-                        // Verifica el combustible
-                        if (avion.Gasolina <= 0) 
-                        {
-                            aviones.Remove(avion);
-                            nextNode.IdAviones.Remove(avion);
-                        }
-                        else if (nextNode.cantGasolina > 15)
-                        {
-                            int tempCombustible = random.Next(1, 5);
-                            nextNode.cantGasolina -= tempCombustible;
-                            avion.Gasolina += tempCombustible;
-                        }
-                        else
-                        {
-                            int tempCombustible = random.Next(1, 3);
-                            nextNode.cantGasolina -= tempCombustible;
-                            avion.Gasolina += tempCombustible;
-                        }
+                    // Verifica el combustible
+                    if (avion.Gasolina <= 0) 
+                    {
+                        aviones.Remove(avion);
+                        nextNode.IdAviones.Remove(avion);
+                        data.RemoveAvionFromDataGrid(avion, AvionesData);
+                    }
+                    else if (nextNode.cantGasolina > 15)
+                    {
+                        int tempCombustible = random.Next(1, 3);
+                        nextNode.cantGasolina -= tempCombustible;
+                        avion.Gasolina += tempCombustible;
+                    }
+                    else
+                    {
+                        int tempCombustible = random.Next(1, 2);
+                        nextNode.cantGasolina -= tempCombustible;
+                        avion.Gasolina += tempCombustible;
                     }
                 }
+                AvionesData.Rows.Add(avion.Id, avion.Origen, avion.Destino, avion.Gasolina); // Se agrega al Grid de los aviones
             }
-            MapPictureBox.Invalidate();
+
+            // Agregar los nodos de los Hangares al Grid
+            foreach (string stringNode in map.nodesInOcean)
+            {
+                List<string> edges = new List<string>();
+                var node = graph.GetNode(stringNode);
+                var ListEdges = graph.GetNeighbors(stringNode) ;
+                foreach (var edge in ListEdges)
+                {
+                    edges.Add(edge.ToString());
+                }
+                // Se agrega al Grid
+                HangarData.Rows.Add(node.Id, string.Join(", ", edges), node.IdAviones.Count, node.cantAviones, node.cantGasolina);
+            }
+            foreach (string stringNode in map.nodesInLand)
+            {
+                List<string> edges = new List<string>();
+                var node = graph.GetNode(stringNode);
+                var ListEdges = graph.GetNeighbors(stringNode);
+                foreach (var edge in ListEdges)
+                {
+                    edges.Add(edge.ToString());
+                }
+                // Se agrega al Grid
+                HangarData.Rows.Add(node.Id, string.Join(", ", edges), node.IdAviones.Count, node.cantAviones, node.cantGasolina);
+            }
+
 
             //Espera aleatoria entre 1 y 3 segundos antes de reiniciar el temporizador
             int randomDelay = random.Next(2000, 5000);
@@ -244,6 +366,67 @@ namespace GameAirWar
 
             //Reiniciamos el temporizador
             avionTimer.Start();
+        }
+
+        // Evento para el movimiento del avión
+        private void VisualTimer_Tick(object sender, EventArgs e)
+        {
+            foreach (var avion in aviones)
+            {
+                if (avion.Ruta.Count > 1)
+                {
+                    avion.Progreso += 0.01f;
+
+                    if (avion.Progreso >= 1.0f)
+                    {
+                        avion.Progreso = 1.0f;
+                    }
+                }
+            }
+            MapPictureBox.Invalidate();
+        }
+
+        // Evento del Timer de la pistola para el movimiento
+        private void GunTimer_Tick( object sender, EventArgs e )
+        {
+            var graph = map.GetGraph() as GraphList;
+            // Reiniciar al borde izquierdo si llega al borde derecho
+            if (gun.X >= MapPictureBox.Width)
+            {
+                gun.Speed = -Math.Abs(gun.Speed);
+            }
+            else if (gun.X <= 0)
+            {
+                gun.Speed = Math.Abs(gun.Speed);
+            }
+            gun.X += gun.Speed;
+
+            // Mover las balas
+            gun.MoveBullets();
+            // Comprobar si alguna bala colisiona con algúna avión
+            gun.CheckBulletCollision(aviones, graph);
+            // Forzar redibujado
+            MapPictureBox.Invalidate();
+        }
+
+        // Función cuando suelta el botón
+        private void MapPictureBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                gun.Shoot(AvionesData, gun.BulletSpeed);
+                isMouseDown = false;
+                gun.BulletSpeed = 10;
+            }
+        }
+
+        // Función para cuando tiene el botón apretado
+        private void MapPictureBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                isMouseDown = true;
+            }
         }
     }
 }

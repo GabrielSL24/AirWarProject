@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameAirWar", "GameAirWar.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphLibrary", "..\GraphLibrary2\GraphLibrary.csproj", "{F8E69BAA-82E4-42A7-A1E2-6AAF34C43C84}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "..\Utils\Utils.csproj", "{BEF1F65E-0E40-4B23-A133-50B0F472EF11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 		{F8E69BAA-82E4-42A7-A1E2-6AAF34C43C84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8E69BAA-82E4-42A7-A1E2-6AAF34C43C84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8E69BAA-82E4-42A7-A1E2-6AAF34C43C84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEF1F65E-0E40-4B23-A133-50B0F472EF11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEF1F65E-0E40-4B23-A133-50B0F472EF11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEF1F65E-0E40-4B23-A133-50B0F472EF11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEF1F65E-0E40-4B23-A133-50B0F472EF11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

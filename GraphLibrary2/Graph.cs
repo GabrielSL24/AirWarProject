@@ -1,4 +1,7 @@
-﻿namespace GraphLibrary
+﻿using GraphLibrary.AdjacencyList;
+using System.Collections.Generic;
+
+namespace GraphLibrary
 {
     public interface Graph
     {
@@ -9,5 +12,7 @@
         /// <param name="targetNodeId">Ending node of the edge</param>
         /// <param name="weight">Weight of the edge</param>
         void AddEdge(string sourceNodeId, string targetNodeId, int weight);
+
+        KeyValuePair<string, object>? GetRandomNode();
     }
 }

@@ -29,7 +29,7 @@ namespace GameAirWar.OperationsMap
             return color.GetBrightness() > 0.9; ;
         }
 
-        //Función para verificar si se creo en el Océano
+        //Función para verificar si se creo en tierra
         internal bool InLand(int x, int y)
         {
             if (x < 0 || y < 0 || x >= _bitmap.Width || y >= _bitmap.Height)

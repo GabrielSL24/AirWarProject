@@ -262,7 +262,7 @@ namespace GameAirWar
                             avion.Distancia = result.distance;
                             avion.RutaColor = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256));
                             aviones.Add(avion);
-                            AvionesData.Rows.Add(avion.Id, avion.Origen, avion.Destino, avion.Gasolina); // Se agrega al Grid de los aviones en caos de que ya exista el avión
+                            AvionesData.Rows.Add(avion.Id, avion.Distancia, avion.Origen, avion.Destino, avion.Gasolina); // Se agrega al Grid de los aviones en caos de que ya exista el avión
                         }
                         else if (originNode.cantAviones > originNode.IdAviones.Count) // Verificar si elHangar no está lleno para crear el avión con ruta
                         {
@@ -270,7 +270,7 @@ namespace GameAirWar
                             avion.RutaColor = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256));
                             aviones.Add(avion);
                             originNode.IdAviones.Add(avion);
-                            AvionesData.Rows.Add(avion.Id, avion.Origen, avion.Destino, avion.Gasolina); // Se agrega al Grid de los aviones
+                            AvionesData.Rows.Add(avion.Id, avion.Distancia, avion.Origen, avion.Destino, avion.Gasolina); // Se agrega al Grid de los aviones
                         }
                         else { continue; }
                     }
